@@ -1,0 +1,17 @@
+<ID, token-attr:"mai_n", lineno:1, column:1>
+<TYPEOF, token-attr:"::", lineno:1, column:6>
+<BEGIN, token-attr:"begin", lineno:2, column:1>
+<ID, token-attr:"a", lineno:3, column:2>
+<RELOP, token-attr:"=", lineno:3, column:4>
+<ID, token-attr:"a", lineno:3, column:6>
+<LPAREN, token-attr:"(", lineno:3, column:7>
+<NUM, token-attr:"1", lineno:3, column:8>
+<OP, token-attr:"-", lineno:3, column:9>
+<NUM, token-attr:"2", lineno:3, column:10>
+<COMMA, token-attr:",", lineno:3, column:11>
+<NUM, token-attr:"3", lineno:3, column:12>
+<RPAREN, token-attr:")", lineno:3, column:13>
+<ID, token-attr:"b", lineno:4, column:5>
+<RELOP, token-attr:"=", lineno:4, column:7>
+<NUM, token-attr:"3.", lineno:4, column:9>
+Error! There is a lexical error at line 4 and column 11.
