@@ -34,31 +34,33 @@ public class Parser
     }
 
     public String type(int i) {
-        return switch (i) {
-            case 10 -> "OP";
-            case 11 -> "RELOP";
-            case 12 -> "TYPEOF";
-            case 13 -> "ASSIGN";
-            case 14 -> "LPAREN";
-            case 15 -> "RPAREN";
-            case 16 -> "SEMI";
-            case 17 -> "COMMA";
-            case 18 -> "FUNCRET";
-            case 19 -> "NUM";
-            case 20 -> "ID";
-            case 21 -> "BEGIN";
-            case 22 -> "END";
-            case 23 -> "INT";
-            case 24 -> "PRINT";
-            case 25 -> "VAR";
-            case 26 -> "FUNC";
-            case 27 -> "IF";
-            case 28 -> "THEN";
-            case 29 -> "ELSE";
-            case 30 -> "WHILE";
-            case 31 -> "VOID";
-            default -> "error";
-        };
+//        if (i == 10) {
+//            return "OP";
+         switch (i) {
+             case 10: return "OP";
+             case 11: return "RELOP";
+             case 12: return "TYPEOF";
+             case 13: return "ASSIGN";
+             case 14: return "LPAREN";
+             case 15: return "RPAREN";
+             case 16: return "SEMI";
+             case 17: return "COMMA";
+             case 18: return "FUNCRET";
+             case 19: return "NUM";
+             case 20: return "ID";
+             case 21: return "BEGIN";
+             case 22: return "END";
+             case 23: return "INT";
+             case 24: return "PRINT";
+             case 25: return "VAR";
+             case 26: return "FUNC";
+             case 27: return "IF";
+             case 28: return "THEN";
+             case 29: return "ELSE";
+             case 30: return "WHILE";
+             case 31: return "VOID";
+             default: return "error";
+        }
     }
 
     public int yyparse() throws Exception
@@ -66,7 +68,7 @@ public class Parser
         while ( true )
         {
             int token = lexer.yylex();  // get next token-name
-//            System.out.println(token);
+//            System.out.println("token names is : " + token);
             Object attr = yylval.obj;   // get      token-attribute
             String tokenname = type(token);
 

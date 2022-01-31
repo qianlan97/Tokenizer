@@ -122,12 +122,52 @@ public class Lexer
                         yyparser.yylval = new ParserVal((Object)c);   // set token-attribute to yyparser.yylval
                         return Parser.OP;                             // return token-name
                     }
-                    if(c == '-') {
-                        realColumn = column +1;
-                        tempAttri[index] = c;
+                    if(c == '-') {                                    //small bugs appear when '-' appears at the end of line
+                        realColumn = column +1;                       //because when searching for '->', a "\n" is deleted.
+                        tempAttri[index] = c;                         //but this should be fine because "-" won't be at the end of the lien
                         index += 1;
                         state = 2;
                         continue;
+                    }
+                    if(c == '=') {
+                        realColumn = column +1;
+                        column = realColumn;
+                        buffer = popChar(buffer, 0);
+                        //index = 0;
+                        yyparser.yylval = new ParserVal((Object)c);
+                        return Parser.RELOP;
+                    }
+                    if(c == '(') {
+                        realColumn = column +1;
+                        column = realColumn;
+                        buffer = popChar(buffer, 0);
+                        //index = 0;
+                        yyparser.yylval = new ParserVal((Object)c);
+                        return Parser.LPAREN;
+                    }
+                    if(c == ')') {
+                        realColumn = column +1;
+                        column = realColumn;
+                        buffer = popChar(buffer, 0);
+                        //index = 0;
+                        yyparser.yylval = new ParserVal((Object)c);
+                        return Parser.RPAREN;
+                    }
+                    if(c == ';') {
+                        realColumn = column +1;
+                        column = realColumn;
+                        buffer = popChar(buffer, 0);
+                        //index = 0;
+                        yyparser.yylval = new ParserVal((Object)c);
+                        return Parser.SEMI;
+                    }
+                    if(c == ',') {
+                        realColumn = column +1;
+                        column = realColumn;
+                        buffer = popChar(buffer, 0);
+                        //index = 0;
+                        yyparser.yylval = new ParserVal((Object)c);
+                        return Parser.COMMA;
                     }
 //                    if (c == '<') {
 //
@@ -137,7 +177,8 @@ public class Lexer
 //                        continue;
 //                    }
                 case 1:
-                    column = realColumn;
+                    realColumn = column +1;
+//                    column = realColumn;
                     buffer = popChar(buffer, 0);
                     yyparser.yylval = new ParserVal((Object)c);
                     return Parser.OP;
@@ -153,6 +194,8 @@ public class Lexer
                         return Parser.FUNCRET;
                     } else {
                         state = 1;
+                        index -= 1;
+                        realColumn -=1;
                         continue;
                     }
 //                case 3:
