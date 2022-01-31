@@ -97,17 +97,18 @@ public class Lexer
             System.out.println("char is:" + c);
             //put these here cuz it does not affect the loop, we just pop it
             //if there're space or return needed for check in pairs, we call specified functions
-            if (Character.isWhitespace(c)) {
-                column += 1;
-                buffer = popChar(buffer,1);
-                continue;
-            }
-            if (c == '\r' || c == '\n' || Character.toString(c).equals("\r\n")) {
+            if (c == '\n') {
                 lineno += 1;
                 column = 0;
                 buffer = popChar(buffer,1);
                 continue;
             }
+            if (Character.isWhitespace(c)) {
+                column += 1;
+                buffer = popChar(buffer,1);
+                continue;
+            }
+
             switch(state)
             {
                 case 0:
