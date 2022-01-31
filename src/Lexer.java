@@ -3,12 +3,13 @@ import java.util.Arrays;
 
 public class Lexer
 {
-    private static final char EOF        =  0;
+    private static final char EOF =  0;
 
     private Parser         yyparser; // parent parser object
     private java.io.Reader reader;   // input stream
     public int             lineno;   // line number
     public int             column;   // column
+    public int             realColumn;
     private char[] buffer;
     private boolean newStart = true;
 
@@ -18,6 +19,7 @@ public class Lexer
         this.yyparser = yyparser;
         lineno = 1;
         column = 0;
+        realColumn = 0;
     }
 
     public char NextChar() throws Exception
@@ -55,21 +57,17 @@ public class Lexer
     }
 
     public char[] popChar(char[] buffer, int i) {
-        char[] temp = Arrays.copyOfRange(buffer, i, buffer.length);
+        //remove the element in the buffer at index i
+        char[] temp = new char[buffer.length-1];
+        if (i >= 0) {
+            System.arraycopy(buffer, 0, temp, 0, i);
+        }
+        if (temp.length - i >= 0) {
+            System.arraycopy(buffer, i + 1, temp, i, temp.length - i);
+        }
         return temp;
     }
 
-//    public int countSize(char[] buffer) {
-//        int count = 0;
-//        for (int i = 0; i < 40960; i++) {
-//            if (buffer[i] != 0) {
-//                count++;
-//            } else {
-//                break;
-//            }
-//        }
-//        return count;
-//    }
 
     // * If yylex reach to the end of file, return  0
     // * If there is an lexical error found, return -1
@@ -79,6 +77,8 @@ public class Lexer
     //   token attribute can be lexeme, line number, colume, etc.
     public int yylex() throws Exception
     {
+        column = realColumn;
+        char[] tempAttri = new char[100];
         int state = 0;
         int index = 0;
         char c;
@@ -90,41 +90,81 @@ public class Lexer
 
         while(true)
         {
-            //After each iteration
-            //1. update line & column number
-            //2. update the buffer (some cases index too)
             c = buffer[index];
-            System.out.println("char is:" + c);
             //put these here cuz it does not affect the loop, we just pop it
-            //if there're space or return needed for check in pairs, we call specified functions
+            //if there's space or newline needed for check in pairs, we call specified functions
             if (c == '\n') {
                 lineno += 1;
                 column = 0;
-                buffer = popChar(buffer,1);
+                realColumn = 0;
+                buffer = popChar(buffer,index);
                 continue;
             }
             if (Character.isWhitespace(c)) {
                 column += 1;
-                buffer = popChar(buffer,1);
+                realColumn +=1;
+                buffer = popChar(buffer,index);
                 continue;
             }
-
             switch(state)
             {
+                //After each iteration
+                //1. update line & column number
+                //2. update the buffer (some cases index too)
+                //3. update state
                 case 0:
-                    if(c == '+' || c == '-' || c == '*' || c == '/') {
-                        column += 1;
-                        buffer = popChar(buffer, 1);
+                    if(c == EOF) { state=999; continue; }
+                    if(c == '+' || c == '*' || c == '/') {
+                        realColumn = column +1;
+                        column = realColumn;
+                        buffer = popChar(buffer, 0);
                         //index = 0;
-//                        state = 100;
-//                        continue;
                         yyparser.yylval = new ParserVal((Object)c);   // set token-attribute to yyparser.yylval
                         return Parser.OP;                             // return token-name
                     }
-                    if(c == EOF) { state=999; continue; }
-                    // return Fail();
-//                case 100:
+                    if(c == '-') {
+                        realColumn = column +1;
+                        tempAttri[index] = c;
+                        index += 1;
+                        state = 2;
+                        continue;
+                    }
+//                    if (c == '<') {
+//
+//                        column += 1;
+//                        index += 1;
+//                        state = 7;
+//                        continue;
+//                    }
+                case 1:
+                    column = realColumn;
+                    buffer = popChar(buffer, 0);
+                    yyparser.yylval = new ParserVal((Object)c);
+                    return Parser.OP;
+                case 2:
+                    if (c == '>') {
+                        column = realColumn;
+                        realColumn +=1;
+                        buffer = popChar(buffer, 0);
+                        buffer = popChar(buffer, 0);
+                        tempAttri[index] = c;
+                        String arrtistr = new String(tempAttri);
+                        yyparser.yylval = new ParserVal((Object)arrtistr);
+                        return Parser.FUNCRET;
+                    } else {
+                        state = 1;
+                        continue;
+                    }
+//                case 3:
 
+//                case 7:
+//                    if (c != '=') {
+//
+//                        state = 3;
+//                        continue;
+//                    } else {
+//                        state = 6;
+//                    }
                 case 999:
                     return EOF;                                     // return end-of-file symbol
                 case 1000:
