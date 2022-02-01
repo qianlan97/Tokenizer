@@ -100,6 +100,17 @@ public class Lexer
                 buffer = popChar(buffer,index);
                 continue;
             }
+//            else if (c == '\r') {
+//                lineno += 1;
+//                column = 0;
+//                realColumn = 0;
+//                if (buffer[index+1] == '\n') {
+//                    buffer = popChar(buffer,index);
+//                    buffer = popChar(buffer,index);
+//                } else {
+//                    buffer = popChar(buffer,index);
+//                }
+//            }
             if (Character.isWhitespace(c)) {
                 column += 1;
                 realColumn +=1;
@@ -121,13 +132,6 @@ public class Lexer
                         //index = 0;
                         yyparser.yylval = new ParserVal((Object)c);   // set token-attribute to yyparser.yylval
                         return Parser.OP;                             // return token-name
-                    }
-                    if(c == '-') {                                    //small bugs appear when '-' appears at the end of line
-                        realColumn = column +1;                       //because when searching for '->', a "\n" is deleted.
-                        tempAttri[index] = c;                         //but this should be fine because "-" won't be at the end of the lien
-                        index += 1;
-                        state = 2;
-                        continue;
                     }
                     if(c == '=') {
                         realColumn = column +1;
@@ -169,20 +173,60 @@ public class Lexer
                         yyparser.yylval = new ParserVal((Object)c);
                         return Parser.COMMA;
                     }
-//                    if (c == '<') {
-//
-//                        column += 1;
-//                        index += 1;
-//                        state = 7;
-//                        continue;
-//                    }
+                    if(c == '-') {
+                        realColumn = column +1;
+                        tempAttri[index] = c;
+                        index += 1;
+                        state = 1;
+                        if (buffer[index] == '\n') {
+                            System.out.println("new line here");
+                            lineno -=1;
+                        }
+                        continue;
+                    }
+                    if (c == '<') {
+                        realColumn = column +1;
+                        tempAttri[index] = c;
+                        index += 1;
+                        state = 2;
+                        if (buffer[index] == '\n') {
+                            System.out.println("new line here");
+                            lineno -=1;
+                        }
+                        continue;
+                    }
+                    if (c == '>') {
+                        realColumn = column +1;
+                        tempAttri[index] = c;
+                        index += 1;
+                        state = 3;
+                        if (buffer[index] == '\n') {
+                            System.out.println("new line here");
+                            lineno -=1;
+                        }
+                        continue;
+                    }
+                    if (c == '!') {
+                        realColumn = column +1;
+                        tempAttri[index] = c;
+                        index += 1;
+                        state = 4;
+                        if (buffer[index] == '\n') {
+                            lineno -=1;
+                        }
+                        continue;
+                    }
+                    if (c == ':') {
+                        realColumn = column +1;
+                        tempAttri[index] = c;
+                        index += 1;
+                        state = 5;
+                        if (buffer[index] == '\n') {
+                            lineno -=1;
+                        }
+                        continue;
+                    }
                 case 1:
-                    realColumn = column +1;
-//                    column = realColumn;
-                    buffer = popChar(buffer, 0);
-                    yyparser.yylval = new ParserVal((Object)c);
-                    return Parser.OP;
-                case 2:
                     if (c == '>') {
                         column = realColumn;
                         realColumn +=1;
@@ -193,20 +237,100 @@ public class Lexer
                         yyparser.yylval = new ParserVal((Object)arrtistr);
                         return Parser.FUNCRET;
                     } else {
-                        state = 1;
-                        index -= 1;
-                        realColumn -=1;
-                        continue;
+                        c = buffer[index-1];
+                        buffer = popChar(buffer,0);
+                        yyparser.yylval = new ParserVal((Object)c);
+                        return Parser.OP;
                     }
-//                case 3:
-
+                case 2:
+                    if (c == '=') {
+                        column = realColumn;
+                        realColumn += 1;
+                        buffer = popChar(buffer, 0);
+                        buffer = popChar(buffer, 0);
+                        tempAttri[index] = c;
+                        String arrtistr = new String(tempAttri);
+                        yyparser.yylval = new ParserVal((Object) arrtistr);
+                        return Parser.RELOP;
+                    } else if (c == '-') {
+                        column = realColumn;
+                        realColumn += 1;
+                        buffer = popChar(buffer, 0);
+                        buffer = popChar(buffer, 0);
+                        tempAttri[index] = c;
+                        String arrtistr = new String(tempAttri);
+                        yyparser.yylval = new ParserVal((Object) arrtistr);
+                        return Parser.ASSIGN;
+                    } else {
+                        c = buffer[index-1];
+                        buffer = popChar(buffer,0);
+                        yyparser.yylval = new ParserVal((Object)c);
+                        return Parser.RELOP;
+                    }
+                case 3:
+                    if (c == '=') {
+                        column = realColumn;
+                        realColumn +=1;
+                        buffer = popChar(buffer, 0);
+                        buffer = popChar(buffer, 0);
+                        tempAttri[index] = c;
+                        String arrtistr = new String(tempAttri);
+                        yyparser.yylval = new ParserVal((Object)arrtistr);
+                    } else {
+                        c = buffer[index-1];
+                        buffer = popChar(buffer,0);
+                        yyparser.yylval = new ParserVal((Object)c);
+                    }
+                    return Parser.RELOP;
+                case 4:
+                    if (c == '=') {
+                        column = realColumn;
+                        realColumn +=1;
+                        buffer = popChar(buffer, 0);
+                        buffer = popChar(buffer, 0);
+                        tempAttri[index] = c;
+                        String arrtistr = new String(tempAttri);
+                        yyparser.yylval = new ParserVal((Object)arrtistr);
+                        return Parser.RELOP;
+                    }
+                case 5:
+                    if (c == ':') {
+                        column = realColumn;
+                        realColumn +=1;
+                        buffer = popChar(buffer, 0);
+                        buffer = popChar(buffer, 0);
+                        tempAttri[index] = c;
+                        String arrtistr = new String(tempAttri);
+                        yyparser.yylval = new ParserVal((Object)arrtistr);
+                        return Parser.TYPEOF;
+                    }
 //                case 7:
-//                    if (c != '=') {
+//                    if (c == '=') {
+//                        column = realColumn;
+//                        realColumn +=1;
+//                        buffer = popChar(buffer,0);
+//                        buffer = popChar(buffer,0);
+//                        tempAttri[index] = c;
+//                        String arrtistr = new String(tempAttri);
+//                        yyparser.yylval = new ParserVal((Object)arrtistr);
+//                        return Parser.RELOP;
+//                    } else if (c == '-') {
 //
-//                        state = 3;
-//                        continue;
+//                    }
+//                    if (c == '>') {
+//                        column = realColumn;
+//                        realColumn +=1;
+//                        buffer = popChar(buffer, 0);
+//                        buffer = popChar(buffer, 0);
+//                        tempAttri[index] = c;
+//                        String arrtistr = new String(tempAttri);
+//                        yyparser.yylval = new ParserVal((Object)arrtistr);
+//                        return Parser.FUNCRET;
 //                    } else {
-//                        state = 6;
+//                        state = 1;
+//                        index -= 1;
+//                        realColumn -=1;
+//                        continue;
 //                    }
                 case 999:
                     return EOF;                                     // return end-of-file symbol
