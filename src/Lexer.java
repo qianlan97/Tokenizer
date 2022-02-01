@@ -12,6 +12,7 @@ public class Lexer
     public int             realColumn;
     private char[] buffer;
     private boolean newStart = true;
+    boolean addLine = false;
 
     public Lexer(java.io.Reader reader, Parser yyparser) throws Exception
     {
@@ -77,22 +78,31 @@ public class Lexer
     //   token attribute can be lexeme, line number, colume, etc.
     public int yylex() throws Exception
     {
-        column = realColumn;
         char[] tempAttri = new char[100];
         int state = 0;
         int index = 0;
         char c;
+        int tempColumn = -3;
+        int tempRealColumn = -3;
+
+        column = realColumn;
         if (newStart) {
             buffer = readAllInput();
             newStart = false;
         }
-
+        if (addLine) {
+            lineno +=1;
+            column = 0;
+            realColumn = 0;
+            addLine = false;
+        }
 
         while(true)
         {
             c = buffer[index];
             //put these here cuz it does not affect the loop, we just pop it
             //if there's space or newline needed for check in pairs, we call specified functions
+
             if (c == '\n') {
                 lineno += 1;
                 column = 0;
@@ -179,8 +189,10 @@ public class Lexer
                         index += 1;
                         state = 1;
                         if (buffer[index] == '\n') {
-                            System.out.println("new line here");
                             lineno -=1;
+                            addLine = true;
+                            tempColumn = column;
+                            tempRealColumn = realColumn;
                         }
                         continue;
                     }
@@ -190,8 +202,10 @@ public class Lexer
                         index += 1;
                         state = 2;
                         if (buffer[index] == '\n') {
-                            System.out.println("new line here");
                             lineno -=1;
+                            addLine = true;
+                            tempColumn = column;
+                            tempRealColumn = realColumn;
                         }
                         continue;
                     }
@@ -201,8 +215,10 @@ public class Lexer
                         index += 1;
                         state = 3;
                         if (buffer[index] == '\n') {
-                            System.out.println("new line here");
                             lineno -=1;
+                            addLine = true;
+                            tempColumn = column;
+                            tempRealColumn = realColumn;
                         }
                         continue;
                     }
@@ -227,6 +243,10 @@ public class Lexer
                         continue;
                     }
                 case 1:
+                    if (tempColumn != -3) {
+                        column = tempColumn;
+                        realColumn = tempRealColumn;
+                    }
                     if (c == '>') {
                         column = realColumn;
                         realColumn +=1;
@@ -237,12 +257,17 @@ public class Lexer
                         yyparser.yylval = new ParserVal((Object)arrtistr);
                         return Parser.FUNCRET;
                     } else {
+                        column = realColumn;
                         c = buffer[index-1];
                         buffer = popChar(buffer,0);
                         yyparser.yylval = new ParserVal((Object)c);
                         return Parser.OP;
                     }
                 case 2:
+                    if (tempColumn != -3) {
+                        column = tempColumn;
+                        realColumn = tempRealColumn;
+                    }
                     if (c == '=') {
                         column = realColumn;
                         realColumn += 1;
@@ -262,12 +287,17 @@ public class Lexer
                         yyparser.yylval = new ParserVal((Object) arrtistr);
                         return Parser.ASSIGN;
                     } else {
+                        column = realColumn;
                         c = buffer[index-1];
                         buffer = popChar(buffer,0);
                         yyparser.yylval = new ParserVal((Object)c);
                         return Parser.RELOP;
                     }
                 case 3:
+                    if (tempColumn != -3) {
+                        column = tempColumn;
+                        realColumn = tempRealColumn;
+                    }
                     if (c == '=') {
                         column = realColumn;
                         realColumn +=1;
@@ -277,6 +307,7 @@ public class Lexer
                         String arrtistr = new String(tempAttri);
                         yyparser.yylval = new ParserVal((Object)arrtistr);
                     } else {
+                        column = realColumn;
                         c = buffer[index-1];
                         buffer = popChar(buffer,0);
                         yyparser.yylval = new ParserVal((Object)c);
@@ -304,34 +335,7 @@ public class Lexer
                         yyparser.yylval = new ParserVal((Object)arrtistr);
                         return Parser.TYPEOF;
                     }
-//                case 7:
-//                    if (c == '=') {
-//                        column = realColumn;
-//                        realColumn +=1;
-//                        buffer = popChar(buffer,0);
-//                        buffer = popChar(buffer,0);
-//                        tempAttri[index] = c;
-//                        String arrtistr = new String(tempAttri);
-//                        yyparser.yylval = new ParserVal((Object)arrtistr);
-//                        return Parser.RELOP;
-//                    } else if (c == '-') {
-//
-//                    }
-//                    if (c == '>') {
-//                        column = realColumn;
-//                        realColumn +=1;
-//                        buffer = popChar(buffer, 0);
-//                        buffer = popChar(buffer, 0);
-//                        tempAttri[index] = c;
-//                        String arrtistr = new String(tempAttri);
-//                        yyparser.yylval = new ParserVal((Object)arrtistr);
-//                        return Parser.FUNCRET;
-//                    } else {
-//                        state = 1;
-//                        index -= 1;
-//                        realColumn -=1;
-//                        continue;
-//                    }
+
                 case 999:
                     return EOF;                                     // return end-of-file symbol
                 case 1000:
