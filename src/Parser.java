@@ -1,18 +1,21 @@
 public class Parser
 {
-    public static final int OP         = 10;    // done "+", "-", "*", "/"
+    //symbols
+    public static final int OP         = 10;    // "+", "-", "*", "/"
     public static final int RELOP      = 11;    // "<", ">", "=", "!=", "<=", ">="
-                                                // done for =
     public static final int TYPEOF     = 12;    // "::"
     public static final int ASSIGN     = 13;    // "<-"
-    public static final int LPAREN     = 14;    // done "("
-    public static final int RPAREN     = 15;    // done ")"
-    public static final int SEMI       = 16;    // done ";"
-    public static final int COMMA      = 17;    // done ","
-    public static final int FUNCRET    = 18;    // done "->"
-                                                // all symbols
+    public static final int LPAREN     = 14;    // "("
+    public static final int RPAREN     = 15;    // ")"
+    public static final int SEMI       = 16;    // ";"
+    public static final int COMMA      = 17;    // ","
+    public static final int FUNCRET    = 18;    // "->"
+    //number
     public static final int NUM        = 19;    // number
+    //.
+    //variables
     public static final int ID         = 20;    // identifier
+    //keywords
     public static final int BEGIN      = 21;    // "begin"
     public static final int END        = 22;    // "end"
     public static final int INT        = 23;    // "int"
@@ -24,6 +27,8 @@ public class Parser
     public static final int ELSE       = 29;    // "else"
     public static final int WHILE      = 30;    // "while"
     public static final int VOID       = 31;    // "void"
+    // b, e, f, i, p, t, v, w, _
+
 
     Compiler         compiler;
     Lexer            lexer;     // lexer.yylex() returns token-name

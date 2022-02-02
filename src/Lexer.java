@@ -44,7 +44,12 @@ public class Lexer
         char[] tempBuffer = new char[4096];
         while (true) {
             try {
-                tempBuffer[index] = NextChar();
+                char temp = NextChar();
+                if (temp != '\r') {
+                    tempBuffer[index] = temp;
+                } else {
+                    continue;
+                }
                 if (tempBuffer[index] != EOF) {
                     index++;
                 } else {
