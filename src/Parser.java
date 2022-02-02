@@ -1,6 +1,7 @@
 public class Parser
 {
     //symbols
+    //all done
     public static final int OP         = 10;    // "+", "-", "*", "/"
     public static final int RELOP      = 11;    // "<", ">", "=", "!=", "<=", ">="
     public static final int TYPEOF     = 12;    // "::"
@@ -10,9 +11,9 @@ public class Parser
     public static final int SEMI       = 16;    // ";"
     public static final int COMMA      = 17;    // ","
     public static final int FUNCRET    = 18;    // "->"
-    //number
+    //number -> case 6
     public static final int NUM        = 19;    // number
-    //.
+    //check for .
     //variables
     public static final int ID         = 20;    // identifier
     //keywords
@@ -28,6 +29,7 @@ public class Parser
     public static final int WHILE      = 30;    // "while"
     public static final int VOID       = 31;    // "void"
     // b, e, f, i, p, t, v, w, _
+    // check for _
 
 
     Compiler         compiler;
