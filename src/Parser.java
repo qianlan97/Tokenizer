@@ -11,10 +11,11 @@ public class Parser
     public static final int SEMI       = 16;    // ";"
     public static final int COMMA      = 17;    // ","
     public static final int FUNCRET    = 18;    // "->"
-    //number -> case 6
+    //number
+    //all done
     public static final int NUM        = 19;    // number
-    //check for .
     //variables
+    // check for _
     public static final int ID         = 20;    // identifier
     //keywords
     public static final int BEGIN      = 21;    // "begin"
@@ -28,8 +29,8 @@ public class Parser
     public static final int ELSE       = 29;    // "else"
     public static final int WHILE      = 30;    // "while"
     public static final int VOID       = 31;    // "void"
-    // b, e, f, i, p, t, v, w, _
-    // check for _
+    // b, e, f, i, p, t, v, w
+
 
 
     Compiler         compiler;

@@ -266,6 +266,22 @@ public class Lexer
                         }
                         continue;
                     }
+                    if (Character.isLetter(c)) {
+                        realColumn +=1;
+                        tempAttri[index] = c;
+                        index += 1;
+                        state = 8;
+                        if (buffer[index] == ' ' || buffer[index] == '\n') {
+                            if (buffer[index] == '\n') {
+                                addLine = true;
+                            }
+                            column = realColumn;
+                            buffer = popChar(buffer, 0);
+                            yyparser.yylval = new ParserVal((Object)c);
+                            return Parser.ID;
+                        }
+                        continue;
+                    }
                     if (c == '.' || c == '_') {
                         column +=1;
                         state = 1000;
@@ -367,7 +383,7 @@ public class Lexer
                             }
                             tempAttri = cleanArray(tempAttri);
                             String arrtistr = new String(tempAttri);
-                            double arrtiNum = Double.valueOf(arrtistr);
+                            double arrtiNum = Double.parseDouble(arrtistr);
                             column +=1;
                             yyparser.yylval = new ParserVal((Object)arrtiNum);
                             return Parser.NUM;
@@ -387,7 +403,7 @@ public class Lexer
                             }
                             tempAttri = cleanArray(tempAttri);
                             String arrtistr = new String(tempAttri);
-                            double arrtiNum = Double.valueOf(arrtistr);
+                            double arrtiNum = Double.parseDouble(arrtistr);
                             column +=1;
                             yyparser.yylval = new ParserVal((Object)arrtiNum);
                             return Parser.NUM;
@@ -412,7 +428,7 @@ public class Lexer
                             }
                             tempAttri = cleanArray(tempAttri);
                             String arrtistr = new String(tempAttri);
-                            double arrtiInt = Double.valueOf(arrtistr);
+                            double arrtiInt = Double.parseDouble(arrtistr);
                             column +=1;
                             yyparser.yylval = new ParserVal((Object)arrtiInt);
                             return Parser.NUM;
@@ -421,6 +437,26 @@ public class Lexer
                     } else {
                         column +=1;
                         return Fail();
+                    }
+                case 8:
+                    if (Character.isLetter(c) || c == '_') {
+                        realColumn += 1;
+                        tempAttri[index] = c;
+                        index += 1;
+                        if (buffer[index] == ' ' || buffer[index] == '\n' || buffer[index] == ':') {
+                            if (buffer[index] == '\n') {
+                                addLine = true;
+                            }
+                            for (int k = 0; k < index; k++) {
+                                buffer = popChar(buffer, 0);
+                            }
+                            tempAttri = cleanArray(tempAttri);
+                            String arrtistr = new String(tempAttri);
+                            column += 1;
+                            yyparser.yylval = new ParserVal((Object) arrtistr);
+                            return Parser.ID;
+                        }
+                        continue;
                     }
                 case 999:
                     return EOF;                                     // return end-of-file symbol
