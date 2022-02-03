@@ -1,7 +1,6 @@
 public class Parser
 {
     //symbols
-    //all done
     public static final int OP         = 10;    // "+", "-", "*", "/"
     public static final int RELOP      = 11;    // "<", ">", "=", "!=", "<=", ">="
     public static final int TYPEOF     = 12;    // "::"
@@ -11,11 +10,9 @@ public class Parser
     public static final int SEMI       = 16;    // ";"
     public static final int COMMA      = 17;    // ","
     public static final int FUNCRET    = 18;    // "->"
-    //number
-    //all done
+    //numbers
     public static final int NUM        = 19;    // number
     //variables
-    // check for _
     public static final int ID         = 20;    // identifier
     //keywords
     public static final int BEGIN      = 21;    // "begin"
@@ -29,9 +26,6 @@ public class Parser
     public static final int ELSE       = 29;    // "else"
     public static final int WHILE      = 30;    // "while"
     public static final int VOID       = 31;    // "void"
-    // b, e, f, i, p, t, v, w
-
-
 
     Compiler         compiler;
     Lexer            lexer;     // lexer.yylex() returns token-name
@@ -44,8 +38,6 @@ public class Parser
     }
 
     public String type(int i) {
-//        if (i == 10) {
-//            return "OP";
          switch (i) {
              case 10: return "OP";
              case 11: return "RELOP";
@@ -78,7 +70,6 @@ public class Parser
         while ( true )
         {
             int token = lexer.yylex();  // get next token-name
-//            System.out.println("token names is : " + token);
             Object attr = yylval.obj;   // get      token-attribute
             String tokenname = type(token);
 

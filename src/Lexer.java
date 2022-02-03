@@ -102,8 +102,6 @@ public class Lexer
         int state = 0;
         int index = 0;
         char c;
-        int tempColumn = -3;
-        int tempRealColumn = -3;
 
         column = realColumn;
         if (newStart) {
@@ -121,7 +119,6 @@ public class Lexer
             c = buffer[index];
             //put these here cuz it does not affect the loop, we just pop it
             //if there's space or newline needed for check in pairs, we call specified functions
-
             if (c == '\n') {
                 lineno += 1;
                 column = 0;
@@ -129,7 +126,7 @@ public class Lexer
                 buffer = popChar(buffer,index);
                 continue;
             }
-            if (c == ' ') {
+            if (c == ' ' || c == '\t') {
                 column += 1;
                 realColumn +=1;
                 buffer = popChar(buffer,index);
@@ -147,7 +144,6 @@ public class Lexer
                         realColumn +=1;
                         column = realColumn;
                         buffer = popChar(buffer, 0);
-                        //index = 0;
                         yyparser.yylval = new ParserVal((Object)c);   // set token-attribute to yyparser.yylval
                         return Parser.OP;                             // return token-name
                     }
@@ -155,7 +151,6 @@ public class Lexer
                         realColumn +=1;
                         column = realColumn;
                         buffer = popChar(buffer, 0);
-                        //index = 0;
                         yyparser.yylval = new ParserVal((Object)c);
                         return Parser.RELOP;
                     }
@@ -163,7 +158,6 @@ public class Lexer
                         realColumn +=1;
                         column = realColumn;
                         buffer = popChar(buffer, 0);
-                        //index = 0;
                         yyparser.yylval = new ParserVal((Object)c);
                         return Parser.LPAREN;
                     }
@@ -171,7 +165,6 @@ public class Lexer
                         realColumn +=1;
                         column = realColumn;
                         buffer = popChar(buffer, 0);
-                        //index = 0;
                         yyparser.yylval = new ParserVal((Object)c);
                         return Parser.RPAREN;
                     }
@@ -179,7 +172,6 @@ public class Lexer
                         realColumn +=1;
                         column = realColumn;
                         buffer = popChar(buffer, 0);
-                        //index = 0;
                         yyparser.yylval = new ParserVal((Object)c);
                         return Parser.SEMI;
                     }
@@ -187,7 +179,6 @@ public class Lexer
                         realColumn +=1;
                         column = realColumn;
                         buffer = popChar(buffer, 0);
-                        //index = 0;
                         yyparser.yylval = new ParserVal((Object)c);
                         return Parser.COMMA;
                     }
@@ -196,7 +187,7 @@ public class Lexer
                         tempAttri[index] = c;
                         index += 1;
                         state = 1;
-                        if (buffer[index] == '\n') {
+                        if (buffer[index] != '>') {
                             column = realColumn;
                             buffer = popChar(buffer,0);
                             yyparser.yylval = new ParserVal((Object)c);
@@ -209,7 +200,7 @@ public class Lexer
                         tempAttri[index] = c;
                         index += 1;
                         state = 2;
-                        if (buffer[index] == '\n') {
+                        if (buffer[index] != '=' && buffer[index] != '-') {
                             column = realColumn;
                             buffer = popChar(buffer,0);
                             yyparser.yylval = new ParserVal((Object)c);
@@ -222,7 +213,7 @@ public class Lexer
                         tempAttri[index] = c;
                         index += 1;
                         state = 3;
-                        if (buffer[index] == '\n') {
+                        if (buffer[index] != '=') {
                             column = realColumn;
                             buffer = popChar(buffer,0);
                             yyparser.yylval = new ParserVal((Object)c);
@@ -255,7 +246,7 @@ public class Lexer
                         tempAttri[index] = c;
                         index += 1;
                         state = 6;
-                        if (buffer[index] == ' ' || buffer[index] == '\n') {
+                        if (buffer[index] == ' ' || buffer[index] == '\t' || (!Character.isDigit(buffer[index]) && buffer[index] != '.') || buffer[index] == '\n') {
                             if (buffer[index] == '\n') {
                                 addLine = true;
                             }
@@ -271,7 +262,7 @@ public class Lexer
                         tempAttri[index] = c;
                         index += 1;
                         state = 8;
-                        if (buffer[index] == ' ' || buffer[index] == '\n') {
+                        if (buffer[index] == ' ' || buffer[index] == '\t' || (!Character.isLetter(buffer[index]) && buffer[index] != '_') || buffer[index] == '\n') {
                             if (buffer[index] == '\n') {
                                 addLine = true;
                             }
@@ -295,12 +286,9 @@ public class Lexer
                         buffer = popChar(buffer, 0);
                         tempAttri[index] = c;
                         tempAttri = cleanArray(tempAttri);
-                        String arrtistr = new String(tempAttri);
-                        yyparser.yylval = new ParserVal((Object)arrtistr);
+                        String attriStr = new String(tempAttri);
+                        yyparser.yylval = new ParserVal((Object)attriStr);
                         return Parser.FUNCRET;
-                    } else {
-                        column +=1;
-                        return Fail();
                     }
                 case 2:
                     if (c == '=') {
@@ -310,8 +298,8 @@ public class Lexer
                         buffer = popChar(buffer, 0);
                         tempAttri[index] = c;
                         tempAttri = cleanArray(tempAttri);
-                        String arrtistr = new String(tempAttri);
-                        yyparser.yylval = new ParserVal((Object) arrtistr);
+                        String attriStr = new String(tempAttri);
+                        yyparser.yylval = new ParserVal((Object) attriStr);
                         return Parser.RELOP;
                     } else if (c == '-') {
                         column = realColumn;
@@ -320,8 +308,8 @@ public class Lexer
                         buffer = popChar(buffer, 0);
                         tempAttri[index] = c;
                         tempAttri = cleanArray(tempAttri);
-                        String arrtistr = new String(tempAttri);
-                        yyparser.yylval = new ParserVal((Object) arrtistr);
+                        String attriStr = new String(tempAttri);
+                        yyparser.yylval = new ParserVal((Object) attriStr);
                         return Parser.ASSIGN;
                     } else {
                         column +=1;
@@ -335,14 +323,9 @@ public class Lexer
                         buffer = popChar(buffer, 0);
                         tempAttri[index] = c;
                         tempAttri = cleanArray(tempAttri);
-                        String arrtistr = new String(tempAttri);
-                        yyparser.yylval = new ParserVal((Object)arrtistr);
+                        String attriStr = new String(tempAttri);
+                        yyparser.yylval = new ParserVal((Object)attriStr);
                         return Parser.RELOP;
-                    } else {
-                        column = realColumn;
-                        c = buffer[index-1];
-                        buffer = popChar(buffer,0);
-                        yyparser.yylval = new ParserVal((Object)c);
                     }
                 case 4:
                     if (c == '=') {
@@ -352,8 +335,8 @@ public class Lexer
                         buffer = popChar(buffer, 0);
                         tempAttri[index] = c;
                         tempAttri = cleanArray(tempAttri);
-                        String arrtistr = new String(tempAttri);
-                        yyparser.yylval = new ParserVal((Object)arrtistr);
+                        String attriStr = new String(tempAttri);
+                        yyparser.yylval = new ParserVal((Object)attriStr);
                         return Parser.RELOP;
                     }
                 case 5:
@@ -364,8 +347,8 @@ public class Lexer
                         buffer = popChar(buffer, 0);
                         tempAttri[index] = c;
                         tempAttri = cleanArray(tempAttri);
-                        String arrtistr = new String(tempAttri);
-                        yyparser.yylval = new ParserVal((Object)arrtistr);
+                        String attriStr = new String(tempAttri);
+                        yyparser.yylval = new ParserVal((Object)attriStr);
                         return Parser.TYPEOF;
                     }
                 case 6:
@@ -374,7 +357,7 @@ public class Lexer
                         tempAttri[index] = c;
                         index += 1;
                         state = 6;
-                        if (buffer[index] == ' ' || buffer[index] == '\n') {
+                        if (buffer[index] == ' ' || buffer[index] == '\t' || (!Character.isDigit(buffer[index]) && buffer[index] != '.') || buffer[index] == '\n') {
                             if (buffer[index] == '\n') {
                                 addLine = true;
                             }
@@ -382,8 +365,8 @@ public class Lexer
                                 buffer = popChar(buffer,0);
                             }
                             tempAttri = cleanArray(tempAttri);
-                            String arrtistr = new String(tempAttri);
-                            double arrtiNum = Double.parseDouble(arrtistr);
+                            String attriStr = new String(tempAttri);
+                            double arrtiNum = Double.parseDouble(attriStr);
                             column +=1;
                             yyparser.yylval = new ParserVal((Object)arrtiNum);
                             return Parser.NUM;
@@ -394,7 +377,7 @@ public class Lexer
                         tempAttri[index] = c;
                         index += 1;
                         state = 7;
-                        if (buffer[index] == ' ' || buffer[index] == '\n') {
+                        if (buffer[index] == ' ' || buffer[index] == '\t' || !Character.isDigit(buffer[index]) || buffer[index] == '\n' || buffer[index] == '.') {
                             if (buffer[index] == '\n') {
                                 addLine = true;
                             }
@@ -402,8 +385,8 @@ public class Lexer
                                 buffer = popChar(buffer,0);
                             }
                             tempAttri = cleanArray(tempAttri);
-                            String arrtistr = new String(tempAttri);
-                            double arrtiNum = Double.parseDouble(arrtistr);
+                            String attriStr = new String(tempAttri);
+                            double arrtiNum = Double.parseDouble(attriStr);
                             column +=1;
                             yyparser.yylval = new ParserVal((Object)arrtiNum);
                             return Parser.NUM;
@@ -418,8 +401,7 @@ public class Lexer
                         realColumn +=1;
                         tempAttri[index] = c;
                         index += 1;
-                        state = 6;
-                        if (buffer[index] == ' ' || buffer[index] == '\n') {
+                        if (buffer[index] == ' ' || buffer[index] == '\t' || !Character.isDigit(buffer[index]) || buffer[index] == '\n' || buffer[index] == '.') {
                             if (buffer[index] == '\n') {
                                 addLine = true;
                             }
@@ -427,8 +409,8 @@ public class Lexer
                                 buffer = popChar(buffer,0);
                             }
                             tempAttri = cleanArray(tempAttri);
-                            String arrtistr = new String(tempAttri);
-                            double arrtiInt = Double.parseDouble(arrtistr);
+                            String attriStr = new String(tempAttri);
+                            double arrtiInt = Double.parseDouble(attriStr);
                             column +=1;
                             yyparser.yylval = new ParserVal((Object)arrtiInt);
                             return Parser.NUM;
@@ -439,11 +421,11 @@ public class Lexer
                         return Fail();
                     }
                 case 8:
-                    if (Character.isLetter(c) || c == '_') {
+                    if (Character.isLetter(c) || Character.isDigit(c) || c == '_') {
                         realColumn += 1;
                         tempAttri[index] = c;
                         index += 1;
-                        if (buffer[index] == ' ' || buffer[index] == '\n' || buffer[index] == ':') {
+                        if (buffer[index] == ' ' || buffer[index] == '\t' || (!Character.isLetter(buffer[index]) && buffer[index] != '_' && !Character.isDigit(buffer[index])) || buffer[index] == '\n') {
                             if (buffer[index] == '\n') {
                                 addLine = true;
                             }
@@ -451,9 +433,44 @@ public class Lexer
                                 buffer = popChar(buffer, 0);
                             }
                             tempAttri = cleanArray(tempAttri);
-                            String arrtistr = new String(tempAttri);
+                            String attriStr = new String(tempAttri);
                             column += 1;
-                            yyparser.yylval = new ParserVal((Object) arrtistr);
+                            switch (attriStr) {
+                                case "begin":
+                                    yyparser.yylval = new ParserVal((Object) attriStr);
+                                    return Parser.BEGIN;
+                                case "end":
+                                    yyparser.yylval = new ParserVal((Object) attriStr);
+                                    return Parser.END;
+                                case "int":
+                                    yyparser.yylval = new ParserVal((Object) attriStr);
+                                    return Parser.INT;
+                                case "print":
+                                    yyparser.yylval = new ParserVal((Object) attriStr);
+                                    return Parser.PRINT;
+                                case "var":
+                                    yyparser.yylval = new ParserVal((Object) attriStr);
+                                    return Parser.VAR;
+                                case "func":
+                                    yyparser.yylval = new ParserVal((Object) attriStr);
+                                    return Parser.FUNC;
+                                case "if":
+                                    yyparser.yylval = new ParserVal((Object) attriStr);
+                                    return Parser.IF;
+                                case "then":
+                                    yyparser.yylval = new ParserVal((Object) attriStr);
+                                    return Parser.THEN;
+                                case "else":
+                                    yyparser.yylval = new ParserVal((Object) attriStr);
+                                    return Parser.ELSE;
+                                case "while":
+                                    yyparser.yylval = new ParserVal((Object) attriStr);
+                                    return Parser.WHILE;
+                                case "void":
+                                    yyparser.yylval = new ParserVal((Object) attriStr);
+                                    return Parser.VOID;
+                            }
+                            yyparser.yylval = new ParserVal((Object) attriStr);
                             return Parser.ID;
                         }
                         continue;
